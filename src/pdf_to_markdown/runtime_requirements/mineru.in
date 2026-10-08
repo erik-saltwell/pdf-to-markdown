@@ -1,0 +1,3 @@
+mineru==4.0.10
+pymupdf==1.28.2
+markdown-it-py==4.2.0

@@ -1,0 +1,5 @@
+pymupdf4llm==1.28.2
+rapidocr==3.9.2
+onnxruntime==1.30.0
+Pillow==12.3.0
+markdown-it-py==4.2.0

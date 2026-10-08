@@ -1,0 +1,5 @@
+docling[rapidocr]==2.135.0
+torch==2.7.1
+torchvision==0.22.1
+pymupdf==1.28.2
+markdown-it-py==4.2.0
