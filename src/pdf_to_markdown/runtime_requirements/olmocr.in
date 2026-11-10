@@ -1,0 +1,3 @@
+olmocr[gpu]==0.4.27
+pymupdf==1.28.2
+markdown-it-py==4.2.0

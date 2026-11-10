@@ -17,7 +17,7 @@ scripts/install-tool.sh
 pdf-to-markdown --help
 ```
 
-Setup installs the CLI as an editable tool and installs **all four** converters
+Setup installs the CLI as an editable tool and installs **all five** converters
 in managed, isolated Python environments. Their Typer and Pillow requirements
 conflict in one environment. Each runtime uses a fully pinned, hashed lock;
 setup checks dependencies and imports before activating the runtime registry.
@@ -30,6 +30,7 @@ Installing only the CLI with `uv tool install` does not provision converters.
 | `marker` (project selection) | Marker 1.10.2 | Local Surya; LLM processing disabled |
 | `pymupdf4llm` | PyMuPDF4LLM 1.28.2 | Layout engine, English Tesseract |
 | `mineru` | MinerU 4.0.10 | Basic tier, local ONNX, automatic OCR |
+| `olmocr` | olmOCR 0.4.27 | Local olmOCR-2-7B-1025-FP8 via vLLM; every page uses the vision model |
 
 Marker uses the local baseline supported by this adapter. It is intentionally
 pinned rather than following releases with different server requirements.
@@ -37,7 +38,10 @@ Marker is selected provisionally in the project's `settings.yaml`, based on
 the Temple of 1000 Swords review. A permanent converter winner remains open.
 
 Dependencies and model caches require several GB. PyTorch layout models use an
-available compatible GPU; CPU extraction is supported but can be slower. The
+available compatible GPU; the original four converters support CPU extraction
+but can be slower. olmOCR requires a compatible NVIDIA GPU and Poppler
+(`sudo apt-get install poppler-utils` on Ubuntu). Its upstream GPU check requires
+at least 15 GiB VRAM; allow room for the FP8 model and vLLM cache. The
 installation and conversions were exercised on Ubuntu x86_64 with Python 3.12
 and an RTX 4090. Other platforms and filesystem implementations are unverified.
 
@@ -52,7 +56,7 @@ The PDF and output folder are required. `--settings` is a global option and
 belongs **before** `convert`. Choose a converter in YAML:
 
 ```yaml
-converter: marker  # docling, marker, pymupdf4llm, or mineru
+converter: marker  # docling, marker, pymupdf4llm, mineru, or olmocr
 ```
 
 By default, settings come from `settings.yaml` in the current working directory.
@@ -85,6 +89,7 @@ Native output names and structure remain visible:
 | Marker | `<book>.md` | `images/` | `<book>_meta.json` with an application report section |
 | PyMuPDF4LLM | `<book>.md` | `images/` | `<book>.chunks.json`, `conversion-report.json` |
 | MinerU | `markdown.md` | `images/` | `middle_json.json`, `structured_content.json`, `model_output.json`, `conversion-report.json` |
+| olmOCR | `<book>.md` | `images/` | `<book>.dolma.json`, `conversion-report.json` |
 
 Marker image basenames remain native; their links are adjusted to the required
 asset subfolder. Empty asset folders are possible when extraction finds no
@@ -100,6 +105,17 @@ at least three pages, evidence that it is outside content, and explicit absence
 of a caption. Missing evidence, symbols, maps, and ambiguous images are kept.
 Filtering decisions appear in the report. Assets still referenced by native
 JSON are retained even when their Markdown reference is filtered.
+
+olmOCR uses its native Dolma character spans to insert physical page comments.
+Any native fallback page, missing result, or incomplete page coverage fails the
+conversion. Native figure links name image files that olmOCR does not create;
+the adapter keeps their descriptions as text and reports the placeholders.
+Embedded source bitmaps are retained conservatively; vector-only figures and figures inside full-page scans may be absent. The native Dolma JSON
+is preserved, while temporary pipeline queues are discarded. Select it with:
+
+```yaml
+converter: olmocr
+```
 
 Some converters label maps as tables. Docling and Marker therefore retain
 unlinked embedded source images conservatively, with links on their physical
@@ -125,7 +141,8 @@ progress. Later runs reuse cached weights. PyMuPDF4LLM reuses installed English
 Tesseract data or downloads a checksum-verified
 [official English model](https://github.com/tesseract-ocr/tessdata_fast/tree/4.1.0).
 The downloaded models execute locally. The PDF is not uploaded for conversion,
-and no paid API, document server, or LLM cleanup is configured.
+and no paid API or LLM cleanup is configured. olmOCR starts a temporary
+local vLLM server bound to `127.0.0.1`; it stops the server after conversion.
 
 Managed runtimes live under
 `${XDG_DATA_HOME:-~/.local/share}/pdf-to-markdown/runtimes/`; model caches live
@@ -188,3 +205,9 @@ pages, tables, stat-block numbers, and map assets were reviewed; observed
 differences are recorded in [the review](.work-items/rpg-pdf-conversion/review.md).
 More books, real scanned books, exhaustive wording review, and difficult
 cross-page layouts remain unverified. Marker is the provisional project selection.
+
+olmOCR setup and a two-page digital/scanned conversion were verified on the
+RTX 4090. Sampled text/numbers, physical page comments, local assets, native JSON,
+no-GPU failure preservation and pipeline termination were checked; see
+[olmOCR verification](.work-items/olmocr-support/progress.md). Large-book content
+fidelity and complex scans remain unverified.

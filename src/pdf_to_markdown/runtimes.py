@@ -1,4 +1,4 @@
-"""Discover the four independently locked local conversion environments."""
+"""Discover the independently locked local conversion environments."""
 
 import hashlib
 import json
@@ -37,5 +37,5 @@ def runtime_python(converter: Converter) -> Path:
     except (OSError, ValueError, KeyError, TypeError) as exc:
         raise RuntimeError(
             "Converter runtimes are not installed or are outdated. "
-            "Run scripts/install-tool.sh from the checkout to install all four."
+            "Run scripts/install-tool.sh from the checkout to install all converters."
         ) from exc

@@ -16,6 +16,7 @@ IMPORTS = {
     "marker": "marker.converters.pdf",
     "pymupdf4llm": "pymupdf4llm",
     "mineru": "mineru.parser",
+    "olmocr": "olmocr.pipeline",
 }
 
 
@@ -73,7 +74,7 @@ def main() -> None:
         temporary.replace(root / "registry.json")
     finally:
         temporary.unlink(missing_ok=True)
-    print("All four converter runtimes are ready. Models download on first use.")
+    print("All converter runtimes are ready. Models download on first use.")
 
 
 if __name__ == "__main__":

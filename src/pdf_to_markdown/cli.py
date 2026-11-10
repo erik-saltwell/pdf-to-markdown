@@ -19,7 +19,7 @@ app = typer.Typer(
         "English OCR runs locally when needed. Results include physical page "
         "references and a conversion report.\n\n"
         "Choose a converter in settings.yaml: docling, marker, pymupdf4llm, "
-        "or mineru. Run show-settings to see the active selection."
+        "mineru, or olmocr. Run show-settings to see the active selection."
     ),
     epilog=(
         "### Quick start\n\n"

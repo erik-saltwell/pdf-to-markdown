@@ -21,6 +21,7 @@ DISTRIBUTIONS = {
     "marker": "marker-pdf",
     "pymupdf4llm": "pymupdf4llm",
     "mineru": "mineru",
+    "olmocr": "olmocr",
 }
 
 
@@ -125,6 +126,7 @@ def runtime_details(converter: str) -> dict[str, Any]:
         "surya-ocr",
         "docling-core",
         "docvortex",
+        "vllm",
     ]:
         try:
             data["runtime_versions"][name] = importlib.metadata.version(name)

@@ -14,6 +14,7 @@ class Converter(StrEnum):
     MARKER = "marker"
     PYMUPDF4LLM = "pymupdf4llm"
     MINERU = "mineru"
+    OLMOCR = "olmocr"
 
 
 @dataclass(frozen=True)
